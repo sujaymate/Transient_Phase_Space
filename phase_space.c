@@ -6,23 +6,26 @@
 // Declare some functions
 void print_usage(void);
 int strings_equal (char *string1, char *string2);
-int get_args(int argc, char** argv, int* all, int* psr, int* rrat, int* frb, int* sun, int* slow, int* TB, int* cryopaf, int* ps_output, int* png_output);
+int get_args(int argc, char** argv, int* all, int* psr, int* rrat, int* frb, int* gx, int* sun, int* slow, int* TB, int* cryopaf,int* mwa, int* ps_output, int* png_output, int* pdf_output);
 
 // Main Function
 int main ( int argc, char* argv[])
 {
-  FILE *gnuplot = popen("/usr/local/bin/gnuplot -persist","w");
+  FILE *gnuplot = popen("/usr/bin/gnuplot -persist","w");
   char path[]="./gach_rud/";
   int check=0;
-  int psr,rrat,frb,sun,agn,gw,fast,slow,galactic,extragal;
-  int TB,cryopaf;
+  int psr,rrat,frb,gx,sun,agn,gw,fast,slow,galactic,extragal;
+  int TB,cryopaf,mwa;
   int top,bottom,request;
-  int all, ps_output, png_output;
+  int all, ps_output, png_output, pdf_output;
   char psr_name[10];
 
-  check=get_args(argc,argv,&all,&psr,&rrat,&frb,&sun,&slow,&TB,&cryopaf,&ps_output,&png_output);
+  check=get_args(argc,argv,&all,&psr,&rrat,&frb,&gx,&sun,&slow,&TB,&cryopaf,&mwa,&ps_output,&png_output,&pdf_output);
   //  check=get_args(argc,argv,&psr,&magnetar,&xdins,&binary,&rrat,&nuller,&fermi,&glitch,&E,&B,&T,&BQC,&death,&top,&bottom,&request,psr_name);
   if (check !=0) return(1);
+
+  /* To follow the GNU License, prominently display the edits we have made */
+  fprintf(stdout, "This program is a modified version of the Transient Phase Space program written by Evan Keane and distributed via https://github.com/FRBs/Transient_Phase_Space . It is released under GNU Public License: check LICENSE to see more details. You will need to provide the luminosity_nuW.txt file in the data directory gach_rud/; this can be generated using S_fluence_wrt_time/plot_brightness_wrt_time.py .\n");
 
   /* Set up axes */
   //fprintf(gnuplot, "set title \"Radio Transient Phase Space\"\n");
@@ -88,14 +91,14 @@ int main ( int argc, char* argv[])
   fprintf(gnuplot, "set label \"Uncertainty Principle\" front at 3.16225e-10,1.0e-3 rotate by 90\n");
 
   /* Label Sources */
-  fprintf(gnuplot, "set label \"GCRT 1745\" front at 10,8.0e2 textcolor rgb '#8B4513'\n");
+  fprintf(gnuplot, "set label \"GCRT 1745\" front at 5,8.0e2 textcolor rgb '#8B4513'\n");
   //fprintf(gnuplot, "set label \"UV Ceti\" front at 5,3.0e-8 textcolor lt -1\n");
   //fprintf(gnuplot, "set label \"AD Leo\" front at 300,5.0e-6 textcolor lt -1\n");
   //fprintf(gnuplot, "set label \"BD LP944\" front at 200,8.0e-9 textcolor lt -1\n");
   //fprintf(gnuplot, "set label \"TVLM 513\" front at 4.0e3,5.0e-7 textcolor lt -1\n");
   fprintf(gnuplot, "set label \"SGR 1935+2154\" front at 1.0e-4,3.0e7 textcolor rgb '#78B3A7'\n");
   fprintf(gnuplot, "set label \"Flare Stars/Brown Dwarves\" front at 10,8.0e-9 textcolor rgb '#8B4513'\n");
-  fprintf(gnuplot, "set label \"Jupiter DAM\" front at 4.0e-5,8.0e-10 textcolor lt -1\n");
+  fprintf(gnuplot, "set label \"Jupiter DAM\" front at 4.0e-5,8.0e-10 textcolor rgb '#8B4513'\n");
   //fprintf(gnuplot, "set label \"X-ray Binaries\" front at 1.0e6,2.0e-1 textcolor rgb '#CD853F'\n");
   fprintf(gnuplot, "set label \"XRBs\" front at 3.0e4,2.0e-1 textcolor rgb '#CD853F'\n");
   fprintf(gnuplot, "set label \"MKT J1704\" front at 5.0e6,1.0e-1 textcolor rgb '#78B3A7'\n");
@@ -128,19 +131,30 @@ int main ( int argc, char* argv[])
   }
   if (psr==1){
     fprintf(gnuplot, "set label \"Pulsars\" front at 1.0e-7,1.0e-2 textcolor rgb '#0000FF'\n");
-    fprintf(gnuplot, "set label \"Crab nano-shots\" front at 2.0e-9,5.0e2 textcolor lt -1\n");
+/*    fprintf(gnuplot, "set label \"Crab nano-shots\" front at 2.0e-9,5.0e2 textcolor lt -1\n"); */
     fprintf(gnuplot, "set label \"Pulsar GRPs\" at 1.0e-8,4.0e5 textcolor rgb '#6A5ACD' front\n");
     fprintf(gnuplot, "replot '%spsrs_2' using 5:6 pt 7 ps 1 lt rgb '#0000FF' notitle\n",path);
-    fprintf(gnuplot, "replot '%scrab_nanogiant' pt 7 ps 1 lt -1 notitle, '%scrab_GRP' using 6:5 pt 7 ps 1 lt rgb '#6A5ACD' notitle\n",path,path);
+/*    fprintf(gnuplot, "replot '%scrab_nanogiant' pt 7 ps 1 lt -1 notitle, '%scrab_GRP' using 6:5 pt 7 ps 1 lt rgb '#6A5ACD' notitle\n",path,path); */
     fprintf(gnuplot, "replot '%sGRPs_vals' every ::1 using 7:8 pt 7 ps 1 lt rgb '#6A5ACD' notitle\n",path); 
   }
   if (rrat==1){
-     fprintf(gnuplot, "set label \"RRATs\" front at 0.02,100 textcolor rgb '#FF0000'\n");
+     fprintf(gnuplot, "set label \"RRATs\" front at 0.00001,5 textcolor rgb '#FF0000'\n");
      fprintf(gnuplot, "replot '%srrats_nohead' using 5:6 pt 7 ps 1 lt rgb '#FF0000' notitle\n",path);
   }
   if (frb==1){
-    fprintf(gnuplot, "set label \"Fast Radio Bursts\" front at 0.0001,1.0e15 textcolor lt -1\n");
-    fprintf(gnuplot, "replot '%sfrbs_vals_to_plot' u 2:1 pt 7 ps 0.8 lt -1 notitle\n",path);
+    fprintf(gnuplot, "set label \"Fast Radio Bursts\" front at 0.0001,1.0e15 textcolor rgb '#F08080'\n");
+    fprintf(gnuplot, "replot '%sfrbs_vals_to_plot' u 2:1 pt 7 ps 0.8 lt rgb '#F08080' notitle\n",path);
+  }
+  if (mwa==1){
+//   See plot_sensitivity.py for derivation of these points 
+    fprintf(gnuplot, "set label \"100 pc\" front at 0.3,0.002 rotate by -12 textcolor rgb 'magenta' font \",30\"\n");
+    fprintf(gnuplot, "set label \"2 kpc\" front at 0.3,0.7 rotate by -12 textcolor rgb 'magenta' font \",30\"\n");
+    fprintf(gnuplot, "set label \"15 kpc\" front at 0.2,50 rotate by -12 textcolor rgb 'magenta' font \",30\"\n");
+    fprintf(gnuplot, "replot '%smwa_search_sensitivity.txt' using 1:2:($3-$1):($4-$2) with vectors lw 7 lt rgb 'magenta' nohead notitle'\n",path);
+  }
+  if (gx==1){
+    fprintf(gnuplot, "set label \"GLEAM-X J162759.5-523504.3\" front at 0.00000005,200 textcolor lt -1\n");
+    fprintf(gnuplot, "replot '%sluminosity_nuW.txt' u 2:1 pt 7 ps 1.0 lt -1 notitle, '%sluminosity_nuW_single.txt' u 2:1 pt 2 ps 2.0 lt -1 notitle\n",path, path);
   }
   if (sun==1){
     fprintf(gnuplot, "set label \"Solar Bursts\" front at 1.0e0,5.0e-6 textcolor rgb '#FFA500'\n");
@@ -179,7 +193,7 @@ int main ( int argc, char* argv[])
     
     fprintf(gnuplot, "replot cryo_point1(x) lt 6, cryo1(x) lt 6, cryo2(x) lt 6, cryo3(x) lt 6, cryo4(x) lt 6, cryo_point1kpc(x) lt 6, cryo_1kpc(x) lt 6, cryo_10kpc(x) lt 6\n");
   }
-  
+    
 
   /* Output plot to file if requested */
   if (ps_output==1){ // POSTSCRIPT
@@ -188,8 +202,13 @@ int main ( int argc, char* argv[])
     fprintf(gnuplot,"replot\n");
   } 
   if (png_output==1){ // PNG
-    fprintf(gnuplot,"set terminal png color\n");
+    fprintf(gnuplot,"set terminal png size 1920,1400 font 'Verdana,30'\n");
     fprintf(gnuplot,"set output \"phase_space.png\"\n");
+    fprintf(gnuplot,"replot\n");
+  }
+  if (pdf_output==1){ // PDF
+    fprintf(gnuplot,"set terminal pdf size 19.2,14 font 'Verdana,40' color\n");
+    fprintf(gnuplot,"set output \"phase_space.pdf\"\n");
     fprintf(gnuplot,"replot\n");
   }
   //fprintf(gnuplot,"set terminal pdf color\n");
@@ -213,21 +232,24 @@ int strings_equal (char *string1, char *string2)
   }
 }
 
-int get_args(int argc, char** argv, int* all, int* psr, int* rrat, int* frb, int* sun, int* slow, int* TB, int* cryopaf, int* ps_output, int* png_output)
+int get_args(int argc, char** argv, int* all, int* psr, int* rrat, int* frb, int* gx, int* sun, int* slow, int* TB, int* cryopaf, int* mwa, int* ps_output, int* png_output, int* pdf_output)
 {
   int ret,compipe[2];
 
   /* Set default values */
-  *all=0;
-  *psr=0;
-  *rrat=0;
-  *frb=0;
-  *sun=0;
-  *slow=0;
-  *TB=0;
+  *all=1;
+  *psr=1;
+  *rrat=1;
+  *frb=1;
+  *gx=1;
+  *sun=1;
+  *slow=1;
+  *TB=1;
   *cryopaf=0;
+  *mwa=1;
   *ps_output=0;
-  *png_output=0;    
+  *png_output=1;    
+  *pdf_output=1;    
 
 /* Cycle through all the command line arguments */
   int i=1;
@@ -240,15 +262,19 @@ int get_args(int argc, char** argv, int* all, int* psr, int* rrat, int* frb, int
     }else if (strings_equal(argv[i],"--help")){
       print_usage();
     }else if (strings_equal(argv[i],"-all")){
-      *all=*psr=*rrat=*frb=*sun=*slow=*TB=*cryopaf=1;
+      *all=*psr=*rrat=*frb=*gx=*sun=*slow=*TB=*cryopaf=1;
     }else if (strings_equal(argv[i],"-frb")){
       *frb=1;
+    }else if (strings_equal(argv[i],"-gleamx")){
+      *gx=1;
     }else if (strings_equal(argv[i],"-ps")){
       *ps_output=1;
     }else if (strings_equal(argv[i],"-psr")){
       *psr=1;
     }else if (strings_equal(argv[i],"-png")){
       *png_output=1;
+    }else if (strings_equal(argv[i],"-pdf")){
+      *pdf_output=1;
     }else if (strings_equal(argv[i],"-rrat")){
       *rrat=1;
     }else if (strings_equal(argv[i],"-slow")){

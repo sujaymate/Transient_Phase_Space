@@ -1,3 +1,11 @@
+<b>Modified code</b>
+
+This program is a modified version of the Transient Phase Space program written by Evan Keane
+and distributed via https://github.com/FRBs/Transient_Phase_Space . It is released under GNU Public
+License: check LICENSE to see more details. You will need to provide the luminosity_nuW.txt file in
+the data directory gach_rud/; this can be generated using S_fluence_wrt_time/plot_brightness_wrt_time.py .
+Original README follows.
+
 <b>Transient phase space plot</b>
 
 This is some code to make a plot that some people have asked me
