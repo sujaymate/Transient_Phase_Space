@@ -148,13 +148,13 @@ int main ( int argc, char* argv[])
   }
   if (mwa==1){
 //   See plot_sensitivity.py for derivation of these points 
-    fprintf(gnuplot, "set label \"100 pc\" front at 0.3,0.002 rotate by -12 textcolor rgb 'magenta' font \",8\"\n");
-    fprintf(gnuplot, "set label \"2 kpc\" front at 0.3,0.7 rotate by -12 textcolor rgb 'magenta' font \",8\"\n");
-    fprintf(gnuplot, "set label \"15 kpc\" front at 0.2,50 rotate by -12 textcolor rgb 'magenta' font \",8\"\n");
+    fprintf(gnuplot, "set label \"100 pc\" front at 0.3,0.002 rotate by -12 textcolor rgb 'magenta' font \",7\"\n");
+    fprintf(gnuplot, "set label \"2 kpc\" front at 0.3,0.7 rotate by -12 textcolor rgb 'magenta' font \",7\"\n");
+    fprintf(gnuplot, "set label \"15 kpc\" front at 0.2,50 rotate by -12 textcolor rgb 'magenta' font \",7\"\n");
     fprintf(gnuplot, "replot '%smwa_search_sensitivity.txt' using 1:2:($3-$1):($4-$2) with vectors lw 1 lt rgb 'magenta' nohead notitle'\n",path);
   }
   if (gx==1){
-    fprintf(gnuplot, "set label \"GLEAM-X J162759.5-523504.3\" front at 0.00000005,200 textcolor lt -1\n");
+    fprintf(gnuplot, "set label \"GLEAM-X J162759.5-523504.3\" front at 0.000005,200 textcolor lt -1\n");
     fprintf(gnuplot, "replot '%sluminosity_nuW.txt' u 2:1 pt 1 ps 0.5 lt -1 notitle, '%sluminosity_nuW_single.txt' u 2:1 pt 13 ps 0.5 lt -1 notitle\n",path, path);
   }
   if (sun==1){
@@ -209,7 +209,7 @@ int main ( int argc, char* argv[])
   }
 //    fprintf(gnuplot,"set terminal pdf size 19.2,14 font 'Helvetica,40' color\n");
   if (pdf_output==1){ // PDF
-    fprintf(gnuplot,"set terminal pdf size 8.9cm,6.4cm font 'Helvetica,8' color\n");
+    fprintf(gnuplot,"set terminal pdf size 8.9cm,6.4cm font 'Helvetica,7' color\n");
     fprintf(gnuplot,"set output \"phase_space.pdf\"\n");
     fprintf(gnuplot,"replot\n");
   }
