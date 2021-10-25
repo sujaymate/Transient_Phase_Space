@@ -91,7 +91,8 @@ int main ( int argc, char* argv[])
   fprintf(gnuplot, "set label \"Uncertainty Principle\" front at 3.16225e-10,1.0e-3 rotate by 90\n");
 
   /* Label Sources */
-  fprintf(gnuplot, "set label \"GCRT 1745\" front at 5,8.0e2 textcolor rgb '#8B4513'\n");
+  fprintf(gnuplot, "set label \"GCRT 1745\" front at 4,9.0e2 textcolor rgb '#8B4513'\n");
+  fprintf(gnuplot, "set label \"AR Sco\" front at 0.005,5.0e3 textcolor rgb '#8B4513'\n");
   //fprintf(gnuplot, "set label \"UV Ceti\" front at 5,3.0e-8 textcolor lt -1\n");
   //fprintf(gnuplot, "set label \"AD Leo\" front at 300,5.0e-6 textcolor lt -1\n");
   //fprintf(gnuplot, "set label \"BD LP944\" front at 200,8.0e-9 textcolor lt -1\n");
@@ -102,12 +103,12 @@ int main ( int argc, char* argv[])
   //fprintf(gnuplot, "set label \"X-ray Binaries\" front at 1.0e6,2.0e-1 textcolor rgb '#CD853F'\n");
   fprintf(gnuplot, "set label \"XRBs\" front at 3.0e4,2.0e-1 textcolor rgb '#CD853F'\n");
   fprintf(gnuplot, "set label \"MKT J1704\" front at 5.0e6,1.0e-1 textcolor rgb '#78B3A7'\n");
-  fprintf(gnuplot, "set label \"AGN/Blazar/QSO\" front at 4.0e3,1.0e+14 textcolor rgb '#0000FF'\n");
+  fprintf(gnuplot, "set label \"AGN/Blazar/QSO\" front at 1.0e3,1.0e+14 textcolor rgb '#0000FF'\n");
   //fprintf(gnuplot, "set label \"QSO/TDE\" front at 5.0e2,1.0e+12 textcolor lt 3\n");
   fprintf(gnuplot, "set label \"GRBs\" front at 3.0e5,1.0e+11 textcolor lt 1\n");
   fprintf(gnuplot, "set label \"Supernovae\" front at 1.0e7,4.0e+5 textcolor rgb '#808080'\n");
   fprintf(gnuplot, "set label \"GW170817\" front at 1.0e7,3.0e+4 textcolor lt 1\n");
-  fprintf(gnuplot, "set label \"RSCVn\" front at 1.0e6,5.0e-3 textcolor lt -1\n");
+  fprintf(gnuplot, "set label \"RSCVn\" front at 1.0e6,5.0e-3 textcolor rgb '#8B0000'\n");
   fprintf(gnuplot, "set label \"Novae\" front at 1.0e8,1.0 textcolor lt 6\n");
   fprintf(gnuplot, "set label \"Magnetic CV\" front at 1.0e4,5.0e-5 textcolor rgb '#228B22'\n");
 
@@ -115,54 +116,50 @@ int main ( int argc, char* argv[])
   fprintf(gnuplot, "plot 1.0e-11\n"); // Basically make an empty plot 
   if (TB==1){
     /* Temperature Labels */
-    fprintf(gnuplot, "set label \"10^{4} K\" front at 4e+8,4e+2 rotate by 50\n");
-    fprintf(gnuplot, "set label \"10^{12} K\" front at 1.5e+6,8e+5 rotate by 50\n");
+    fprintf(gnuplot, "set label \"10^{4} K\" front at 6e+7,1.3e+1 rotate by 50\n");
+    fprintf(gnuplot, "set label \"10^{12} K\" front at 3e+5,3e+4 rotate by 50\n");
     fprintf(gnuplot, "set label \"10^{20} K\" front at 1.5e+3,8e+7 rotate by 50\n");
     fprintf(gnuplot, "set label \"10^{28} K\" front at 4,4e+10 rotate by 50\n");
 
     /* Coherent - Incoherent boundaries */
-    fprintf(gnuplot, "set label \"Coherent Emission\" front at 1.0e3,20 rotate by 50\n");
-    fprintf(gnuplot, "set label \"Incoherent Emission\" front at 1.5e+3,1.0e0 rotate by 50\n");
-    fprintf(gnuplot, "set arrow from 2.0e4,1.0e5 to 1.0e2,8.0e7 lt -1 lw 2 front\n");
-    fprintf(gnuplot, "set arrow from 2.0e5,4.0e3 to 2.0e7,10 lt -1 lw 2 front\n");
+//    fprintf(gnuplot, "set label \"Coherent Emission\" front at 1.0e3,20 rotate by 50\n");
+//    fprintf(gnuplot, "set label \"Incoherent Emission\" front at 1.5e+3,1.0e0 rotate by 50\n");
+//    fprintf(gnuplot, "set arrow from 2.0e4,1.0e5 to 1.0e2,8.0e7 lt -1 lw 1 front\n");
+//    fprintf(gnuplot, "set arrow from 2.0e5,4.0e3 to 2.0e7,10 lt -1 lw 1 front\n");
 
     /* Constant Brightness Temperature Lines */
-    fprintf(gnuplot, "replot L12(x) notitle w filledcurve x2=1e10 lt rgb '#87CEFA', L4(x) notitle lt 0 lw 2, L8(x) notitle lt 0 lw 2, L12(x) notitle lt 0 lw 2, L16(x) notitle lt 0 lw 2, L20(x) notitle lt 0 lw 2, L24(x) notitle lt 0 lw 2, L28(x) notitle lt 0 lw 2, L32(x) notitle lt 0 lw 2, L36(x) notitle lt 0 lw 2, L40(x) notitle lt 0 lw 2\n");
+    fprintf(gnuplot, "replot L12(x) notitle w filledcurve x2=1e10 lt rgb '#87CEFA', L4(x) notitle lt 0 lw 0.5, L8(x) notitle lt 0 lw 0.5, L12(x) notitle lt 0 lw 0.5, L16(x) notitle lt 0 lw 0.5, L20(x) notitle lt 0 lw 0.5, L24(x) notitle lt 0 lw 0.5, L28(x) notitle lt 0 lw 0.5, L32(x) notitle lt 0 lw 0.5, L36(x) notitle lt 0 lw 0.5, L40(x) notitle lt 0 lw 0.5\n");
   }
   if (psr==1){
-    fprintf(gnuplot, "set label \"Pulsars\" front at 1.0e-7,1.0e-2 textcolor rgb '#0000FF'\n");
+    fprintf(gnuplot, "set label \"Pulsars\" front at 1.0e-7,2.0e-2 textcolor rgb '#0000FF'\n");
 /*    fprintf(gnuplot, "set label \"Crab nano-shots\" front at 2.0e-9,5.0e2 textcolor lt -1\n"); */
     fprintf(gnuplot, "set label \"Pulsar GRPs\" at 1.0e-8,4.0e5 textcolor rgb '#6A5ACD' front\n");
-    fprintf(gnuplot, "replot '%spsrs_2' using 5:6 pt 7 ps 1 lt rgb '#0000FF' notitle\n",path);
-/*    fprintf(gnuplot, "replot '%scrab_nanogiant' pt 7 ps 1 lt -1 notitle, '%scrab_GRP' using 6:5 pt 7 ps 1 lt rgb '#6A5ACD' notitle\n",path,path); */
-    fprintf(gnuplot, "replot '%sGRPs_vals' every ::1 using 7:8 pt 7 ps 1 lt rgb '#6A5ACD' notitle\n",path); 
+    fprintf(gnuplot, "replot '%spsrs_2' using 5:6 pt 7 ps 0.3 lt rgb '#0000FF' notitle\n",path);
+/*    fprintf(gnuplot, "replot '%scrab_nanogiant' pt 7 ps 0.3 lt -1 notitle, '%scrab_GRP' using 6:5 pt 7 ps 0.3 lt rgb '#6A5ACD' notitle\n",path,path); */
+    fprintf(gnuplot, "replot '%sGRPs_vals' every ::1 using 7:8 pt 7 ps 0.3 lt rgb '#6A5ACD' notitle\n",path); 
   }
   if (rrat==1){
      fprintf(gnuplot, "set label \"RRATs\" front at 0.00001,5 textcolor rgb '#FF0000'\n");
-     fprintf(gnuplot, "replot '%srrats_nohead' using 5:6 pt 7 ps 1 lt rgb '#FF0000' notitle\n",path);
+     fprintf(gnuplot, "replot '%srrats_nohead' using 5:6 pt 7 ps 0.3 lt rgb '#FF0000' notitle\n",path);
   }
   if (frb==1){
-    fprintf(gnuplot, "set label \"Fast Radio Bursts\" front at 0.0001,1.0e15 textcolor rgb '#F08080'\n");
-    fprintf(gnuplot, "replot '%sfrbs_vals_to_plot' u 2:1 pt 7 ps 0.8 lt rgb '#F08080' notitle\n",path);
+    fprintf(gnuplot, "set label \"Fast Radio Bursts\" front at 0.0001,2.0e15 textcolor rgb '#F08080'\n");
+    fprintf(gnuplot, "replot '%sfrbs_vals_to_plot' u 2:1 pt 7 ps 0.3 lt rgb '#F08080' notitle\n",path);
   }
   if (mwa==1){
 //   See plot_sensitivity.py for derivation of these points 
-    fprintf(gnuplot, "set label \"100 pc\" front at 0.3,0.002 rotate by -12 textcolor rgb 'magenta' font \",30\"\n");
-    fprintf(gnuplot, "set label \"2 kpc\" front at 0.3,0.7 rotate by -12 textcolor rgb 'magenta' font \",30\"\n");
-    fprintf(gnuplot, "set label \"15 kpc\" front at 0.2,50 rotate by -12 textcolor rgb 'magenta' font \",30\"\n");
-    fprintf(gnuplot, "replot '%smwa_search_sensitivity.txt' using 1:2:($3-$1):($4-$2) with vectors lw 7 lt rgb 'magenta' nohead notitle'\n",path);
+    fprintf(gnuplot, "set label \"100 pc\" front at 0.3,0.002 rotate by -12 textcolor rgb 'magenta' font \",8\"\n");
+    fprintf(gnuplot, "set label \"2 kpc\" front at 0.3,0.7 rotate by -12 textcolor rgb 'magenta' font \",8\"\n");
+    fprintf(gnuplot, "set label \"15 kpc\" front at 0.2,50 rotate by -12 textcolor rgb 'magenta' font \",8\"\n");
+    fprintf(gnuplot, "replot '%smwa_search_sensitivity.txt' using 1:2:($3-$1):($4-$2) with vectors lw 1 lt rgb 'magenta' nohead notitle'\n",path);
   }
   if (gx==1){
     fprintf(gnuplot, "set label \"GLEAM-X J162759.5-523504.3\" front at 0.00000005,200 textcolor lt -1\n");
-    fprintf(gnuplot, "replot '%sluminosity_nuW.txt' u 2:1 pt 7 ps 1.0 lt -1 notitle, '%sluminosity_nuW_single.txt' u 2:1 pt 2 ps 2.0 lt -1 notitle\n",path, path);
+    fprintf(gnuplot, "replot '%sluminosity_nuW.txt' u 2:1 pt 1 ps 0.5 lt -1 notitle, '%sluminosity_nuW_single.txt' u 2:1 pt 13 ps 0.5 lt -1 notitle\n",path, path);
   }
   if (sun==1){
     fprintf(gnuplot, "set label \"Solar Bursts\" front at 1.0e0,5.0e-6 textcolor rgb '#FFA500'\n");
-    fprintf(gnuplot, "replot '%ssolar_vals' every ::1 using 5:6 pt 7 ps 1 lt rgb '#FFA500' notitle\n",path);
-  }
-  if (slow==1){
-    fprintf(gnuplot, "set arrow from 0.0014,141135000.00 to 0.0014,14113500000.0 lt rgb '#78B3A7' lw 2 front\n"); // SGR 1935+2154 lower limit
-    fprintf(gnuplot, "replot '%sSGR1935+2154' using ($3*$4):($1*$2*$2) pt 7 ps 1 lt rgb '#78B3A7' notitle, '%sflarey_boi' using 1:2 pt 7 ps 1 lt rgb '#78B3A7' notitle, '%smisc' using 1:2 pt 7 ps 1 lt rgb '#8B4513' notitle, 'gach_rud/Gosia_AGN_QSO_Blazar_TDE2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt rgb '#0000FF' notitle, 'gach_rud/Gosia_XRB2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt rgb '#CD853F' notitle, 'gach_rud/Gosia_GRB2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt 1 notitle, 'gach_rud/Gosia_SN2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt rgb '#808080' notitle, 'gach_rud/Gosia_RSCVn2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt -1 notitle, 'gach_rud/Gosia_flare_stars2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt rgb '#8B4513' notitle, 'gach_rud/Gosia_Novae2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt 6 notitle, 'gach_rud/Gosia_MagCV2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 1 lt rgb '#228B22' notitle, 'gach_rud/gw170817' pt 7 ps 1 lt 1 notitle\n",path,path,path);
+    fprintf(gnuplot, "replot '%ssolar_vals' every ::1 using 5:6 pt 7 ps 0.3 lt rgb '#FFA500' notitle\n",path);
   }
 
   /* Parkes CryoPAF */
@@ -194,6 +191,10 @@ int main ( int argc, char* argv[])
     fprintf(gnuplot, "replot cryo_point1(x) lt 6, cryo1(x) lt 6, cryo2(x) lt 6, cryo3(x) lt 6, cryo4(x) lt 6, cryo_point1kpc(x) lt 6, cryo_1kpc(x) lt 6, cryo_10kpc(x) lt 6\n");
   }
     
+  if (slow==1){
+    fprintf(gnuplot, "set arrow from 0.0014,141135000.00 to 0.0014,14113500000.0 lt rgb '#78B3A7' lw 1 front\n"); // SGR 1935+2154 lower limit
+    fprintf(gnuplot, "replot '%sSGR1935+2154' using ($3*$4):($1*$2*$2) pt 7 ps 0.3 lt rgb '#78B3A7' notitle, '%sflarey_boi' using 1:2 pt 7 ps 0.3 lt rgb '#78B3A7' notitle, '%smisc' using 1:2 pt 7 ps 0.3 lt rgb '#8B4513' notitle, 'gach_rud/Gosia_AGN_QSO_Blazar_TDE2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt rgb '#0000FF' notitle, 'gach_rud/Gosia_XRB2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt rgb '#CD853F' notitle, 'gach_rud/Gosia_GRB2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt 1 notitle, 'gach_rud/Gosia_SN2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt rgb '#808080' notitle, 'gach_rud/Gosia_RSCVn2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt rgb '#8B0000' notitle, 'gach_rud/Gosia_flare_stars2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt rgb '#8B4513' notitle, 'gach_rud/Gosia_Novae2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt 6 notitle, 'gach_rud/Gosia_MagCV2' using ($2*86400.0*$9):($7*1.05026e-20) pt 7 ps 0.3 lt rgb '#228B22' notitle, 'gach_rud/gw170817' pt 7 ps 0.3 lt 1 notitle\n",path,path,path);
+  }
 
   /* Output plot to file if requested */
   if (ps_output==1){ // POSTSCRIPT
@@ -202,12 +203,13 @@ int main ( int argc, char* argv[])
     fprintf(gnuplot,"replot\n");
   } 
   if (png_output==1){ // PNG
-    fprintf(gnuplot,"set terminal png size 1920,1400 font 'Verdana,30'\n");
+    fprintf(gnuplot,"set terminal png size 1920,1400 font 'Helvetica,30'\n");
     fprintf(gnuplot,"set output \"phase_space.png\"\n");
     fprintf(gnuplot,"replot\n");
   }
+//    fprintf(gnuplot,"set terminal pdf size 19.2,14 font 'Helvetica,40' color\n");
   if (pdf_output==1){ // PDF
-    fprintf(gnuplot,"set terminal pdf size 19.2,14 font 'Verdana,40' color\n");
+    fprintf(gnuplot,"set terminal pdf size 8.9cm,6.4cm font 'Helvetica,8' color\n");
     fprintf(gnuplot,"set output \"phase_space.pdf\"\n");
     fprintf(gnuplot,"replot\n");
   }
