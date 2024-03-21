@@ -35,7 +35,6 @@ data_path = Path(__file__).parent.joinpath("gach_rud")
 
 # set font
 mpl.rcParams["font.family"] = "serif"
-#mpl.rc("text", usetex=True)
 mpl.rcParams["font.weight"] = 500
 mpl.rcParams['mathtext.default'] = 'regular'
 
@@ -80,18 +79,19 @@ trans = ax1.transAxes
 rot = np.rad2deg(np.arctan(2)) # somehow rotation equal to aspect ratio works
 rot = ax1.transData.transform_angles([rot], np.array([1, 1])[None, :])[0]
 
-Tbs = np.geomspace(1e4, 1e40, 10, endpoint=True)
-Tb_text = np.isin(Tbs, [1e4, 1e12, 1e20, 1e28, 1e36])
-x_text = [5e8, 5e8, 5e3, 10, 0.065]
+Tbs = np.geomspace(1e4, 1e40, 10, endpoint=True)  # sample Temp values
+Tb_text = np.isin(Tbs, [1e4, 1e12, 1e20, 1e28, 1e36])  # only print temp value at these temp
+x_text = [5e8, 5e8, 5e3, 10, 0.065]  # xvals to calc. temp value text position
 j = 0  # iterator for text
 for i, Tb in enumerate(Tbs):
+    # set zorder of Temp line such that it is not behind fill_between
     if Tb < 1e13:
         zorder=1
     else:
         zorder=0
     ax1.plot(xticks, L_Tb(xticks, Tb), ls='--', lw=.8, c='#808080', alpha=0.5, dashes=(2, 2), zorder=zorder)
     if Tb_text[i]:
-        # temp name
+        # print temp value text
         ax1.text(x_text[j], L_Tb(x_text[j], Tb), f"10$^{{{np.log10(Tb):2.0f}}}$ K",
                  fontsize=12, rotation=rot, va='top', ha='center', zorder=2)
         j+=1
@@ -215,7 +215,6 @@ ax1.text(0.5, 0.175, "Solar Bursts", c='#ff8b00', fontsize=fs, va='center', ha='
 flstars = np.loadtxt(data_path.joinpath("Gosia_flare_stars2"), usecols=(1, 6, 8), skiprows=1)
 ax1.scatter(flstars[:, 0]*86400*flstars[:, 2], flstars[:, 1]*1.05026e-20, c="#9d6f46", s=ms)
 ax1.text(0.75, 0.07, "Flaring Stars/Brown Dwarves", c='#9d6f46', fontsize=fs, va='center', ha='center', transform=trans)
-
 
 fig.savefig("phase_space_py.png", dpi=150)
 plt.show()
