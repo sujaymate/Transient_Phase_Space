@@ -16,9 +16,9 @@ def L_Tb(nuW:np.array, Tb:float) -> np.array:
         = (3.621e+22)*L/(nu.W)**2
         = (         )*L/x**2
      --> L = T_B*x**2*(2.761e-23)    Watts/Hz
-           = [ ]*(1.05025e-11)  Jy,kpc^2
+           = [ ]*(1.05025e-13)  Jy,kpc^2
  
-    NB. 1 W.Hz^{-1} == 1.05026*10^{-11} Jy.kpc^2
+    NB. 1 W.Hz^{-1} == 1.05026*10^{-13} Jy.kpc^2
 
     Args:
         nuW (np.array): Fiducial width
@@ -84,12 +84,7 @@ Tb_text = np.isin(Tbs, [1e4, 1e12, 1e20, 1e28, 1e36])  # only print temp value a
 x_text = [5e8, 5e8, 5e3, 10, 0.065]  # xvals to calc. temp value text position
 j = 0  # iterator for text
 for i, Tb in enumerate(Tbs):
-    # set zorder of Temp line such that it is not behind fill_between
-    if Tb < 1e13:
-        zorder=1
-    else:
-        zorder=0
-    ax1.plot(xticks, L_Tb(xticks, Tb), ls='--', lw=.8, c='#808080', alpha=0.5, dashes=(2, 2), zorder=zorder)
+    ax1.plot(xticks, L_Tb(xticks, Tb), ls='--', lw=.8, c='#808080', alpha=0.5, dashes=(2, 2), zorder=1)
     if Tb_text[i]:
         # print temp value text
         ax1.text(x_text[j], L_Tb(x_text[j], Tb), f"10$^{{{np.log10(Tb):2.0f}}}$ K",
@@ -114,9 +109,16 @@ ax1.annotate("", xy=(x1+dx, y1 - dx ), xytext=(x1, y1),
 ax1.annotate("", xy=(x2-dx, y2 + dx ), xytext=(x2, y2),
              arrowprops=dict(arrowstyle="->, head_length=1,head_width=0.25"), xycoords=trans)
 
+# Add CHIME/Slow and CHIME/FRB range
+ax1.axvspan(1e-3*.6, 128e-3*.6, color='#445172', lw=1.2, alpha=0.5, zorder=0)
+ax1.text(.375, 0.02, "CHIME/FRB", fontsize=13, rotation=90, ha='left', transform=trans)
+
+ax1.axvspan(50e-3*.6, 5*.6, color='#b6a38d', ls='--', lw=1.2, alpha=0.7, zorder=0)
+ax1.text(0.47, 0.02, "CHIME/Slow", fontsize=13, rotation=90, ha='left', transform=trans)
+
 # set marker and fontsize for source points and labels
 ms=5
-fs=12
+fs=11
 
 # plot pulsars
 psr = np.loadtxt(data_path.joinpath("psrs_2"), usecols=(4,5))
@@ -141,19 +143,37 @@ ax1.text(0.275, 0.4, "RRATs", c='#FF0000', fontsize=fs, va='center', ha='center'
 
 # plot FRBs
 frb = np.loadtxt(data_path.joinpath("frbs_vals_to_plot"), usecols=(1,0), skiprows=1)
-ax1.scatter(*frb.T, c="#F08080", s=ms)
-ax1.text(0.3, 0.85, "FRBs", c='#F08080', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.scatter(*frb.T, c="#841b2d", s=ms)
+ax1.text(0.3, 0.85, "FRBs", c='#841b2d', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot SGR 1935+2154
 sgr = np.loadtxt(data_path.joinpath("SGR1935+2154"))
 ax1.errorbar(sgr[2]*sgr[3], sgr[0]*sgr[1]**2, yerr=sgr[0]*sgr[1]**3,
-             lolims=True, fmt=".", ms=ms, lw=1, c='#166461')
-ax1.text(0.35, 0.65, "SGR 1935+2154", c='#166461', fontsize=fs, va='center', ha='center', transform=trans)
+             lolims=True, fmt=".", ms=ms, lw=1, c='#841b2d')
+ax1.text(0.35, 0.65, "SGR 1935+2154", c='#841b2d', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot GLEAM-X
 gx = np.loadtxt(data_path.joinpath("luminosity_nuW.txt"), usecols=(1, 0), skiprows=1)
 ax1.scatter(*gx.T, c="#231F20", s=ms)
-ax1.text(0.525, 0.39, "GLEAM-X", c='#231F20', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.525, 0.48, "GLEAM-X", c='#231F20', fontsize=fs, va='center', ha='center', transform=trans)
+
+# plot GPM 1839-10
+# load data (freq, flux @ freq, flux @ 1GHz, fluence @ freq)
+gpm_data = np.loadtxt(data_path.joinpath("GPM1839-10_pulse_table.csv"), delimiter=",", usecols=(4, 5, 6, 7))
+gpm_data = gpm_data[gpm_data[:, 1] != 0]
+gpm_dist = 5.7 * 3.0857e21  # only mean dist. taken, errors are ignored
+nu_w = gpm_data[:, 0]*1e-3 * gpm_data[:, 3] / gpm_data[:, 1]  # in sec, approximated as fluence / peak flux
+nonzero_nu_w = nu_w > 0
+nu_w = nu_w[nonzero_nu_w]
+
+# Luminosity of each pulse determined using Eqn 4 in Methods section of Hurley-Walker et al 2023. Omega_1GHz is set to 1
+alpha = -3.17  # only the mean value take, errors ignored
+beta = -0.26
+q = -0.56  # only the mean value take, errors ignored
+L0 = 4 * np.pi * gpm_dist**2 * gpm_data[:, 2]*1e-3 * np.sqrt(np.pi/abs(q)) * np.exp(-(alpha + beta + 1)**2/(4*abs(q))) # Jy
+L0 = L0[nonzero_nu_w]* 1.05e-43  # Jy kpc^2
+ax1.scatter(nu_w, L0, c="#e60453", s=ms)
+ax1.text(0.55, 0.35, "GPM 1839-10", c='#e60453', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot AGNs/Blazars/QSO
 agns = np.loadtxt(data_path.joinpath("Gosia_AGN_QSO_Blazar_TDE2"), usecols=(1, 6, 8), skiprows=1)
@@ -185,36 +205,6 @@ xrbs = np.loadtxt(data_path.joinpath("Gosia_XRB2"), usecols=(1, 6, 8))
 ax1.scatter(xrbs[:, 0]*86400*xrbs[:, 2], xrbs[:, 1]*1.05026e-20, c="#CD853F", s=ms)
 ax1.text(0.76, 0.36, "XRBs", c='#CD853F', fontsize=fs, va='center', ha='center', transform=trans)
 
-# misc (Jupiter DAM and GCRT)
-misc = np.loadtxt(data_path.joinpath("misc"), usecols=(0, 1))
-ax1.scatter(*misc.T, c="#9d6f46", s=ms)
-ax1.text(0.375, 0.04, "Jupiter DAM", c='#9d6f46', fontsize=fs, va='center', ha='center', transform=trans)
-ax1.text(0.58, 0.49, "GCRT 1745", c='#9d6f46', fontsize=fs, va='center', ha='center', transform=trans)
-
-# MKT J1704 
-mkt = np.loadtxt(data_path.joinpath("flarey_boi"), usecols=(0, 1))
-ax1.scatter(*mkt.T, c="#87a922", s=ms)
-ax1.text(0.91, 0.348, "MKT J1704", c='#87a922', fontsize=fs, va='center', ha='center', transform=trans)
-
-# RSCVn
-rscv = np.loadtxt(data_path.joinpath("Gosia_RSCVn2"), usecols=(1, 6, 8))
-ax1.scatter(rscv[:, 0]*86400*rscv[:, 2], rscv[:, 1]*1.05026e-20, c="#293432", s=ms)
-ax1.text(0.85, 0.275, "RSCVn", c='#293432', fontsize=fs, va='center', ha='center', transform=trans)
-
-# Magnetic CV
-magcv = np.loadtxt(data_path.joinpath("Gosia_MagCV2"), usecols=(1, 6, 8), skiprows=1)
-ax1.scatter(magcv[:, 0]*86400*magcv[:, 2], magcv[:, 1]*1.05026e-20, c="#228B22", s=ms)
-ax1.text(0.7, 0.22, "Magnetic CV", c='#228B22', fontsize=fs, va='center', ha='center', transform=trans)
-
-# Solar flares
-solar = np.loadtxt(data_path.joinpath("solar_vals"), usecols=(4, 5), skiprows=1)
-ax1.scatter(*solar.T, c="#ff8b00", s=ms)
-ax1.text(0.5, 0.175, "Solar Bursts", c='#ff8b00', fontsize=fs, va='center', ha='center', transform=trans)
-
-# flaring stars
-flstars = np.loadtxt(data_path.joinpath("Gosia_flare_stars2"), usecols=(1, 6, 8), skiprows=1)
-ax1.scatter(flstars[:, 0]*86400*flstars[:, 2], flstars[:, 1]*1.05026e-20, c="#9d6f46", s=ms)
-ax1.text(0.75, 0.07, "Flaring Stars/Brown Dwarves", c='#9d6f46', fontsize=fs, va='center', ha='center', transform=trans)
-
-fig.savefig("phase_space_py.png", dpi=150)
+fig.savefig(data_path.parent.joinpath("phase_space_py.png"), dpi=150)
+fig.savefig(data_path.parent.joinpath("phase_space_py.pdf"))
 plt.show()
