@@ -6,6 +6,7 @@ from matplotlib import transforms
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 
 def L_Tb(nuW:np.array, Tb:float) -> np.array:
@@ -69,7 +70,7 @@ ax2.yaxis.set_ticklabels(labels, va='bottom')
 # set labels and fontsizes
 ax1.tick_params('both', labelsize=11.5)
 ax2.tick_params('y', labelsize=11.5)
-ax1.set_xlabel("$\\nu \cdot $W (GHz s)", fontsize=15, labelpad=-2)
+ax1.set_xlabel("$\\nu \\cdot $W (GHz s)", fontsize=15, labelpad=-2)
 ax1.set_ylabel("L$_{\\nu}$ (Jy kpc$^2$)", fontsize=15,labelpad=-10)
 ax2.set_ylabel("L$_{\\nu}$ (ergs s$^{-1}$ Hz$^{-1}$)", fontsize=15, labelpad=5)
 fig.subplots_adjust(0.09, 0.08, 0.9, .98)
@@ -96,7 +97,7 @@ ax1.axvspan(1e-10, 1e-9, color='#808080', alpha=0.9, zorder=-1)
 ax1.text(0.015, 0.5, "Uncertainty Principle", fontsize=13, rotation=90, va='center', transform=trans)
 
 # coherent/incoherent region
-ax1.fill_between(xticks, L_Tb(xticks, 1e12), color='#87CEFA', zorder=0)
+ax1.fill_between(xticks, L_Tb(xticks, 1e12), color='#87CEFA', alpha=0.8, zorder=0)
 ax1.text(0.25e5*10, 7.5e4*10, "Coherent Emission", fontsize=13, rotation=rot, va='center', ha='center')
 ax1.text(1e5*10, 2.0e4*10, "Incoherent Emission", fontsize=13, rotation=rot, va='center', ha='center')
 
@@ -110,15 +111,15 @@ ax1.annotate("", xy=(x2-dx, y2 + dx ), xytext=(x2, y2),
              arrowprops=dict(arrowstyle="->, head_length=1,head_width=0.25"), xycoords=trans)
 
 # Add CHIME/Slow and CHIME/FRB range
-ax1.axvspan(1e-3*.6, 100e-3*.6, color='#445172', lw=1.2, alpha=0.4, zorder=0)
+ax1.axvspan(1e-3*.6, 100e-3*.6, color='#808080', lw=1.2, alpha=0.4, zorder=0)
 ax1.text(.375, 0.02, "CHIME/FRB", fontsize=13, rotation=90, ha='left', transform=trans)
 
-ax1.axvspan(16e-3*.6, 5*.6, color='#ffcc33', ls='--', lw=1.2, alpha=0.4, zorder=0)
+ax1.axvspan(16e-3*.6, 5*.6, color='#ffcc33', ls='--', lw=1.2, alpha=0.3, zorder=0)
 ax1.text(0.45, 0.02, "CHIME/Slow", fontsize=13, rotation=90, ha='left', transform=trans)
 
 # set marker and fontsize for source points and labels
 ms=10
-fs=11
+fs=10
 
 # plot pulsars
 psr = np.loadtxt(data_path.joinpath("psrs_2"), usecols=(4,5))
@@ -143,34 +144,42 @@ ax1.text(0.275, 0.4, "RRATs", c='#FF0000', fontsize=fs, va='center', ha='center'
 
 # plot FRBs
 frb = np.loadtxt(data_path.joinpath("frbs_vals_to_plot"), usecols=(1,0), skiprows=1)
-ax1.scatter(*frb.T, c="#841b2d", s=ms)
-ax1.text(0.3, 0.85, "FRBs", c='#841b2d', fontsize=fs, va='center', ha='center', transform=trans)
+#ax1.scatter(*frb.T, c="#841b2d", s=ms)
+ax1.scatter(*frb.T, c="#f08080", s=ms)
+ax1.text(0.3, 0.85, "FRBs", c='#f08080', fontsize=fs, va='center', ha='center', transform=trans)
 
 # chime slow new
 chime_slow = np.loadtxt(data_path.joinpath("chime_slow_detections_new.dat"), usecols=(1, 2, 3, 4), skiprows=1)
 nu_w_slow = chime_slow[0] * chime_slow[1] / 1000
 lum_slow = 4*np.pi*(chime_slow[3]*1000)**2*chime_slow[2]  # Jy kpc2
-ax1.scatter(nu_w_slow, lum_slow, s=15, c='#10622b')
-ax1.errorbar(nu_w_slow, lum_slow, yerr=lum_slow**1.1,
-             lolims=True, fmt=".", ms=10, lw=1.1, c='#10622b')
+ax1.scatter(nu_w_slow, lum_slow, s=30, marker="^", c='#05bd18', lw=0.5, edgecolors='black', alpha=0.7, label='FRB 20230204C')
 
 # chime slow r117
 chime_slow = np.loadtxt(data_path.joinpath("chime_slow_detections_r117.dat"), usecols=(1, 2, 3, 4), skiprows=1)
 nu_w_slow = chime_slow[:, 0] * chime_slow[:, 1] / 1000
 lum_slow = 4*np.pi*(chime_slow[:, 3]*1000)**2*chime_slow[:, 2]  # Jy kpc2
-ax1.scatter(nu_w_slow, lum_slow, s=15, c='#1e9627')
+ax1.scatter(nu_w_slow, lum_slow, s=30, marker="o", c='#05bd18', lw=0.5, edgecolors='black', alpha=0.7, label='FRB 20220912A Bursts')
 
+# add legend
+ax1.legend(fontsize=10, loc='lower right', framealpha=1)
+
+# add a circle around the above points
+center = (0.41, 0.867)  # (x, y) coordinates
+radius = 0.0258
+
+circle = patches.Circle(center, radius, facecolor='None', edgecolor='black', linewidth=1., transform=ax1.transAxes)
+ax1.add_patch(circle)
 
 # plot SGR 1935+2154
 sgr = np.loadtxt(data_path.joinpath("SGR1935+2154"))
 ax1.errorbar(sgr[2]*sgr[3], sgr[0]*sgr[1]**2, yerr=sgr[0]*sgr[1]**3,
-             lolims=True, fmt=".", ms=ms, lw=1, c='#841b2d')
-ax1.text(0.35, 0.65, "SGR 1935+2154", c='#841b2d', fontsize=fs, va='center', ha='center', transform=trans)
+             lolims=True, fmt=".", ms=ms, lw=1, c='#04a283')
+ax1.text(0.35, 0.65, "SGR 1935+2154", c='#04a283', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot GLEAM-X
 gx = np.loadtxt(data_path.joinpath("luminosity_nuW.txt"), usecols=(1, 0), skiprows=1)
 ax1.scatter(*gx.T, c="#231F20", s=ms)
-ax1.text(0.47, 0.46, "GLEAM-X", c='#231F20', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.62, 0.43, "GLEAM-X", c='#231F20', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot MWA LPTs
 # plot GPM 1839-10
@@ -186,10 +195,11 @@ nu_w = nu_w[nonzero_nu_w]
 alpha = -3.17  # only the mean value take, errors ignored
 beta = -0.26
 q = -0.56  # only the mean value take, errors ignored
-L0 = 4 * np.pi * gpm_dist**2 * gpm_data[:, 2]*1e-3 * np.sqrt(np.pi/abs(q)) * np.exp(-(alpha + beta + 1)**2/(4*abs(q))) # Jy kp^2
+#L0 = 4 * np.pi * gpm_dist**2 * gpm_data[:, 2]*1e-3 * np.sqrt(np.pi/abs(q)) * np.exp(-(alpha + beta + 1)**2/(4*abs(q))) # Jy kp^2
+L0 = gpm_dist**2 * gpm_data[:, 1] # Jy kpc^2 pseudo lum
 L0 = L0[nonzero_nu_w] #* 1.05e-43
-ax1.scatter(nu_w, L0, c="#6A760D", alpha=0.8, s=ms)
-ax1.text(0.63, 0.41, "GPM\n1839-10", c='#6A760D', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.scatter(nu_w, L0, c="#b00068", alpha=0.8, s=ms, zorder=0)
+ax1.text(0.52, 0.51, "GPM 1839-10", c='#b00068', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot MeerKAT LPT (code from Iris De Ruiter)
 psrJ0901_peak_flux = np.array([13.4e-3, 25.4e-3]) # in Jy (Lband, Uband) in image
@@ -198,13 +208,10 @@ psrJ0901_dist = np.mean([328e-3, 467e-3]) # average of ymw16 and ne2001 in kpc
 psrJ0901_widths = np.array([2, 2]) # in secs (Lband, Uband) in image
 psrJ0901_freq = np.array([1.284, 0.816]) # in GHz
 
-psrJ0901_lum = 4*np.pi*psrJ0901_peak_flux*psrJ0901_dist**2
-
-#[mtp0013_peak_fluxdensities[i]*mtp0013_dist**2 
-#               for i in range(len(mtp0013_peak_fluxdensities))] # in Jy kpc^2
+psrJ0901_lum = psrJ0901_peak_flux*psrJ0901_dist**2
 
 ax1.scatter(psrJ0901_freq*psrJ0901_widths, psrJ0901_lum, c="#c60000", s=ms)
-ax1.text(0.52, 0.28, "PSR\nJ0901-4046", c='#c60000', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.63, 0.28, "PSR J0901-4046", c='#c60000', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot ASKAP source (code from Iris De Ruiter, data from Manisha Caleb)
 askap_1935_dist = np.mean([4.3, 5.4])  # Mean of NE2001 and YMW16 distances in kpc
@@ -213,10 +220,10 @@ askap_1935_peak_flux = np.loadtxt(data_path.joinpath("askap_1935_2148.csv"), use
 tint_spans = np.array([1, 1, 5, 3, 2, 1, 1, 1, 2, 1, 2, 4, 2, 6, 2, 1]) # in number of integrations
 askap_freq = 887.5*1e-3 # in GHz
 
-askap_1935_lum = 4*np.pi*askap_1935_peak_flux*1e-3*askap_1935_dist**2  # Jy kpc
+askap_1935_lum = askap_1935_peak_flux*1e-3*askap_1935_dist**2  # Jy kpc
 
-plt.scatter(askap_freq*tint_spans*10, askap_1935_lum, c="#cc6600", s=ms)
-ax1.text(0.6, 0.49, "ASKAP\n1935+2148", c='#cc6600', fontsize=fs, va='center', ha='center', transform=trans)
+plt.scatter(askap_freq*tint_spans*10, askap_1935_lum, c="#c13f05", s=ms)
+ax1.text(0.645, 0.38, "ASKAP\n1935+2148", c='#c13f05', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot LOFAR ILT J1101 + 5521 (code and data from Iris De Ruiter)
 ilt_J1101_flux = np.array([68, 78, 256, 46, 93, 123, 41])/1000 # in Jy from Overleaf
@@ -225,9 +232,20 @@ LOFAR_freq = 0.144 # GHz
 ilt_J1101_duration = np.array([8, 5, 8, 4, 7, 6, 9])*8 #seconds
 dist_ilt_J1101 = 0.504  # kpc
 
-ilt_J1101_lum = 4*np.pi*ilt_J1101_flux*dist_ilt_J1101**2  # Jy kpc
+ilt_J1101_lum = ilt_J1101_flux*dist_ilt_J1101**2  # Jy kpc
 plt.scatter(LOFAR_freq*ilt_J1101_duration, ilt_J1101_lum, c="#6a329f", s=ms)
-ax1.text(0.63, 0.35, "ILT\nJ2202+5521", c='#6a329f', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.655, 0.32, "ILT J1101+5521", c='#6a329f', fontsize=fs, va='center', ha='center', transform=trans)
+
+# plot CHIME J0630+25 (Dong et al)
+chime_j0630 = np.loadtxt(data_path.joinpath("CHIME_J0630.txt"))
+chime_j0630_flux = chime_j0630[:,1] / chime_j0630[:,0]  # in Jy, fluence / width
+chime_j0630_dist = 0.170  # in kpc
+chime_j0630_lum = chime_j0630_flux*chime_j0630_dist**2
+
+plt.scatter(chime_j0630[:,0]*0.6*1e-3, chime_j0630_lum, c="#180161", s=ms)
+ax1.text(0.58, 0.23, "CHIME J0630+25", c='#180161', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.annotate("", xy=(0.47, 0.3 ), xytext=(0.51, 0.25),
+             arrowprops=dict(arrowstyle="->, head_length=1,head_width=0.2",color='#180161'), xycoords=trans)
 
 # plot AGNs/Blazars/QSO
 agns = np.loadtxt(data_path.joinpath("Gosia_AGN_QSO_Blazar_TDE2"), usecols=(1, 6, 8), skiprows=1)
@@ -252,12 +270,12 @@ ax1.text(0.95, 0.65, "Supernovae", c='#6b4730', fontsize=fs, va='center', ha='ce
 # Novae
 novae = np.loadtxt(data_path.joinpath("Gosia_Novae2"), usecols=(1, 6, 8))
 ax1.scatter(novae[:, 0]*86400*novae[:, 2], novae[:, 1]*1.05026e-20, c="#01748e", s=ms)
-ax1.text(0.95, 0.4, "Novae", c='#01748e', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.9, 0.35, "Novae", c='#01748e', fontsize=fs, va='center', ha='center', transform=trans)
 
 # XRBs
 xrbs = np.loadtxt(data_path.joinpath("Gosia_XRB2"), usecols=(1, 6, 8))
 ax1.scatter(xrbs[:, 0]*86400*xrbs[:, 2], xrbs[:, 1]*1.05026e-20, c="#CD853F", s=ms)
-ax1.text(0.76, 0.36, "XRBs", c='#CD853F', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.78, 0.36, "XRBs", c='#CD853F', fontsize=fs, va='center', ha='center', transform=trans)
 
 fig.savefig(data_path.parent.joinpath("phase_space_py.png"), dpi=150)
 fig.savefig(data_path.parent.joinpath("phase_space_py.pdf"))
