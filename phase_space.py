@@ -164,17 +164,17 @@ ax1.scatter(nu_w_slow, lum_slow, s=30, marker="o", c='#05bd18', lw=0.5, edgecolo
 ax1.legend(fontsize=10, loc='lower right', framealpha=1)
 
 # add a circle around the above points
-center = (0.41, 0.867)  # (x, y) coordinates
-radius = 0.0258
+center = (0.419, 0.868)  # (x, y) coordinates
+radius = 0.031
 
-circle = patches.Circle(center, radius, facecolor='None', edgecolor='black', linewidth=1., transform=ax1.transAxes)
+circle = patches.Circle(center, radius, facecolor='None', edgecolor='black', linewidth=0.9, transform=ax1.transAxes)
 ax1.add_patch(circle)
 
 # plot SGR 1935+2154
 sgr = np.loadtxt(data_path.joinpath("SGR1935+2154"))
 ax1.errorbar(sgr[2]*sgr[3], sgr[0]*sgr[1]**2, yerr=sgr[0]*sgr[1]**3,
-             lolims=True, fmt=".", ms=ms, lw=1, c='#04a283')
-ax1.text(0.35, 0.65, "SGR 1935+2154", c='#04a283', fontsize=fs, va='center', ha='center', transform=trans)
+             lolims=True, fmt=".", ms=ms, lw=1, c='#d03b3b')
+ax1.text(0.35, 0.65, "SGR 1935+2154", c='#d03b3b', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot GLEAM-X
 gx = np.loadtxt(data_path.joinpath("luminosity_nuW.txt"), usecols=(1, 0), skiprows=1)
