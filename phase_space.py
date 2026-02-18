@@ -6,6 +6,7 @@ from matplotlib import transforms
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 
 def L_Tb(nuW:np.array, Tb:float) -> np.array:
@@ -16,9 +17,9 @@ def L_Tb(nuW:np.array, Tb:float) -> np.array:
         = (3.621e+22)*L/(nu.W)**2
         = (         )*L/x**2
      --> L = T_B*x**2*(2.761e-23)    Watts/Hz
-           = [ ]*(1.05025e-11)  Jy,kpc^2
+           = [ ]*(1.05025e-13)  Jy,kpc^2
  
-    NB. 1 W.Hz^{-1} == 1.05026*10^{-11} Jy.kpc^2
+    NB. 1 W.Hz^{-1} == 1.05026*10^{-13} Jy.kpc^2
 
     Args:
         nuW (np.array): Fiducial width
@@ -69,7 +70,7 @@ ax2.yaxis.set_ticklabels(labels, va='bottom')
 # set labels and fontsizes
 ax1.tick_params('both', labelsize=11.5)
 ax2.tick_params('y', labelsize=11.5)
-ax1.set_xlabel("$\\nu \cdot $W (GHz s)", fontsize=15, labelpad=-2)
+ax1.set_xlabel("$\\nu \\cdot $W (GHz s)", fontsize=15, labelpad=-2)
 ax1.set_ylabel("L$_{\\nu}$ (Jy kpc$^2$)", fontsize=15,labelpad=-10)
 ax2.set_ylabel("L$_{\\nu}$ (ergs s$^{-1}$ Hz$^{-1}$)", fontsize=15, labelpad=5)
 fig.subplots_adjust(0.09, 0.08, 0.9, .98)
@@ -81,15 +82,10 @@ rot = ax1.transData.transform_angles([rot], np.array([1, 1])[None, :])[0]
 
 Tbs = np.geomspace(1e4, 1e40, 10, endpoint=True)  # sample Temp values
 Tb_text = np.isin(Tbs, [1e4, 1e12, 1e20, 1e28, 1e36])  # only print temp value at these temp
-x_text = [5e8, 5e8, 5e3, 10, 0.065]  # xvals to calc. temp value text position
+x_text = [5e8, 5e8, 5e3, 10, 0.000065]  # xvals to calc. temp value text position
 j = 0  # iterator for text
 for i, Tb in enumerate(Tbs):
-    # set zorder of Temp line such that it is not behind fill_between
-    if Tb < 1e13:
-        zorder=1
-    else:
-        zorder=0
-    ax1.plot(xticks, L_Tb(xticks, Tb), ls='--', lw=.8, c='#808080', alpha=0.5, dashes=(2, 2), zorder=zorder)
+    ax1.plot(xticks, L_Tb(xticks, Tb), ls='--', lw=.8, c='#808080', alpha=0.5, dashes=(2, 2), zorder=1)
     if Tb_text[i]:
         # print temp value text
         ax1.text(x_text[j], L_Tb(x_text[j], Tb), f"10$^{{{np.log10(Tb):2.0f}}}$ K",
@@ -101,12 +97,12 @@ ax1.axvspan(1e-10, 1e-9, color='#808080', alpha=0.9, zorder=-1)
 ax1.text(0.015, 0.5, "Uncertainty Principle", fontsize=13, rotation=90, va='center', transform=trans)
 
 # coherent/incoherent region
-ax1.fill_between(xticks, L_Tb(xticks, 1e12), color='#87CEFA', zorder=0)
-ax1.text(0.25e5, 2.5e4, "Coherent Emission", fontsize=13, rotation=rot, va='center', ha='center')
-ax1.text(1e5, 0.25e4, "Incoherent Emission", fontsize=13, rotation=rot, va='center', ha='center')
+ax1.fill_between(xticks, L_Tb(xticks, 1e12), color='#87CEFA', alpha=0.8, zorder=0)
+ax1.text(0.25e5*10, 7.5e4*10, "Coherent Emission", fontsize=13, rotation=rot, va='center', ha='center')
+ax1.text(1e5*10, 2.0e4*10, "Incoherent Emission", fontsize=13, rotation=rot, va='center', ha='center')
 
 # add arrows
-x1 = 0.76; y1 = 0.52
+x1 = 0.77; y1 = 0.5
 x2 = 0.71; y2 = 0.56
 dx = 0.125
 ax1.annotate("", xy=(x1+dx, y1 - dx ), xytext=(x1, y1),
@@ -114,9 +110,16 @@ ax1.annotate("", xy=(x1+dx, y1 - dx ), xytext=(x1, y1),
 ax1.annotate("", xy=(x2-dx, y2 + dx ), xytext=(x2, y2),
              arrowprops=dict(arrowstyle="->, head_length=1,head_width=0.25"), xycoords=trans)
 
+# Add CHIME/Slow and CHIME/FRB range
+ax1.axvspan(1e-3*.6, 100e-3*.6, color='#808080', lw=1.2, alpha=0.4, zorder=0)
+ax1.text(.375, 0.02, "CHIME/FRB", fontsize=13, rotation=90, ha='left', transform=trans)
+
+ax1.axvspan(16e-3*.6, 5*.6, color='#ffcc33', ls='--', lw=1.2, alpha=0.3, zorder=0)
+ax1.text(0.45, 0.02, "CHIME/Slow", fontsize=13, rotation=90, ha='left', transform=trans)
+
 # set marker and fontsize for source points and labels
-ms=5
-fs=12
+ms=10
+fs=10
 
 # plot pulsars
 psr = np.loadtxt(data_path.joinpath("psrs_2"), usecols=(4,5))
@@ -141,19 +144,108 @@ ax1.text(0.275, 0.4, "RRATs", c='#FF0000', fontsize=fs, va='center', ha='center'
 
 # plot FRBs
 frb = np.loadtxt(data_path.joinpath("frbs_vals_to_plot"), usecols=(1,0), skiprows=1)
-ax1.scatter(*frb.T, c="#F08080", s=ms)
-ax1.text(0.3, 0.85, "FRBs", c='#F08080', fontsize=fs, va='center', ha='center', transform=trans)
+#ax1.scatter(*frb.T, c="#841b2d", s=ms)
+ax1.scatter(*frb.T, c="#f08080", s=ms)
+ax1.text(0.3, 0.85, "FRBs", c='#f08080', fontsize=fs, va='center', ha='center', transform=trans)
+
+# chime slow new
+chime_slow = np.loadtxt(data_path.joinpath("chime_slow_detections_new.dat"), usecols=(1, 2, 3, 4), skiprows=1)
+nu_w_slow = chime_slow[0] * chime_slow[1] / 1000
+lum_slow = 4*np.pi*(chime_slow[3]*1000)**2*chime_slow[2]  # Jy kpc2
+ax1.scatter(nu_w_slow, lum_slow, s=30, marker="^", c='#05bd18', lw=0.5, edgecolors='black', alpha=0.7, label='FRB 20230204C')
+
+# chime slow r117
+chime_slow = np.loadtxt(data_path.joinpath("chime_slow_detections_r117.dat"), usecols=(1, 2, 3, 4), skiprows=1)
+nu_w_slow = chime_slow[:, 0] * chime_slow[:, 1] / 1000
+lum_slow = 4*np.pi*(chime_slow[:, 3]*1000)**2*chime_slow[:, 2]  # Jy kpc2
+ax1.scatter(nu_w_slow, lum_slow, s=30, marker="o", c='#05bd18', lw=0.5, edgecolors='black', alpha=0.7, label='FRB 20220912A Bursts')
+
+# add legend
+ax1.legend(fontsize=10, loc='lower right', framealpha=1)
+
+# add a circle around the above points
+center = (0.419, 0.868)  # (x, y) coordinates
+radius = 0.031
+
+circle = patches.Circle(center, radius, facecolor='None', edgecolor='black', linewidth=0.9, transform=ax1.transAxes)
+ax1.add_patch(circle)
 
 # plot SGR 1935+2154
 sgr = np.loadtxt(data_path.joinpath("SGR1935+2154"))
 ax1.errorbar(sgr[2]*sgr[3], sgr[0]*sgr[1]**2, yerr=sgr[0]*sgr[1]**3,
-             lolims=True, fmt=".", ms=ms, lw=1, c='#166461')
-ax1.text(0.35, 0.65, "SGR 1935+2154", c='#166461', fontsize=fs, va='center', ha='center', transform=trans)
+             lolims=True, fmt=".", ms=ms, lw=1, c='#d03b3b')
+ax1.text(0.35, 0.65, "SGR 1935+2154", c='#d03b3b', fontsize=fs, va='center', ha='center', transform=trans)
 
 # plot GLEAM-X
 gx = np.loadtxt(data_path.joinpath("luminosity_nuW.txt"), usecols=(1, 0), skiprows=1)
 ax1.scatter(*gx.T, c="#231F20", s=ms)
-ax1.text(0.525, 0.39, "GLEAM-X", c='#231F20', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.62, 0.43, "GLEAM-X", c='#231F20', fontsize=fs, va='center', ha='center', transform=trans)
+
+# plot MWA LPTs
+# plot GPM 1839-10
+# load data (freq, flux @ freq, flux @ 1GHz, fluence @ freq)
+gpm_data = np.loadtxt(data_path.joinpath("GPM1839-10_pulse_table.csv"), delimiter=",", usecols=(4, 5, 6, 7))
+gpm_data = gpm_data[gpm_data[:, 1] != 0]
+gpm_dist = 5.7 #* 3.0857e21  # only mean dist. taken, errors are ignored
+nu_w = gpm_data[:, 0]*1e-3 * gpm_data[:, 3] / gpm_data[:, 1]  # in sec, approximated as fluence / peak flux
+nonzero_nu_w = nu_w > 0
+nu_w = nu_w[nonzero_nu_w]
+
+# Luminosity of each pulse determined using Eqn 4 in Methods section of Hurley-Walker et al 2023. Omega_1GHz is set to 1
+alpha = -3.17  # only the mean value take, errors ignored
+beta = -0.26
+q = -0.56  # only the mean value take, errors ignored
+#L0 = 4 * np.pi * gpm_dist**2 * gpm_data[:, 2]*1e-3 * np.sqrt(np.pi/abs(q)) * np.exp(-(alpha + beta + 1)**2/(4*abs(q))) # Jy kp^2
+L0 = gpm_dist**2 * gpm_data[:, 1] # Jy kpc^2 pseudo lum
+L0 = L0[nonzero_nu_w] #* 1.05e-43
+ax1.scatter(nu_w, L0, c="#b00068", alpha=0.8, s=ms, zorder=0)
+ax1.text(0.52, 0.51, "GPM 1839-10", c='#b00068', fontsize=fs, va='center', ha='center', transform=trans)
+
+# plot MeerKAT LPT (code from Iris De Ruiter)
+psrJ0901_peak_flux = np.array([13.4e-3, 25.4e-3]) # in Jy (Lband, Uband) in image
+psrJ0901_dist = np.mean([328e-3, 467e-3]) # average of ymw16 and ne2001 in kpc 
+
+psrJ0901_widths = np.array([2, 2]) # in secs (Lband, Uband) in image
+psrJ0901_freq = np.array([1.284, 0.816]) # in GHz
+
+psrJ0901_lum = psrJ0901_peak_flux*psrJ0901_dist**2
+
+ax1.scatter(psrJ0901_freq*psrJ0901_widths, psrJ0901_lum, c="#c60000", s=ms)
+ax1.text(0.63, 0.28, "PSR J0901-4046", c='#c60000', fontsize=fs, va='center', ha='center', transform=trans)
+
+# plot ASKAP source (code from Iris De Ruiter, data from Manisha Caleb)
+askap_1935_dist = np.mean([4.3, 5.4])  # Mean of NE2001 and YMW16 distances in kpc
+askap_1935_peak_flux = np.loadtxt(data_path.joinpath("askap_1935_2148.csv"), usecols=(3), delimiter=',')
+
+tint_spans = np.array([1, 1, 5, 3, 2, 1, 1, 1, 2, 1, 2, 4, 2, 6, 2, 1]) # in number of integrations
+askap_freq = 887.5*1e-3 # in GHz
+
+askap_1935_lum = askap_1935_peak_flux*1e-3*askap_1935_dist**2  # Jy kpc
+
+plt.scatter(askap_freq*tint_spans*10, askap_1935_lum, c="#c13f05", s=ms)
+ax1.text(0.645, 0.38, "ASKAP\n1935+2148", c='#c13f05', fontsize=fs, va='center', ha='center', transform=trans)
+
+# plot LOFAR ILT J1101 + 5521 (code and data from Iris De Ruiter)
+ilt_J1101_flux = np.array([68, 78, 256, 46, 93, 123, 41])/1000 # in Jy from Overleaf
+
+LOFAR_freq = 0.144 # GHz
+ilt_J1101_duration = np.array([8, 5, 8, 4, 7, 6, 9])*8 #seconds
+dist_ilt_J1101 = 0.504  # kpc
+
+ilt_J1101_lum = ilt_J1101_flux*dist_ilt_J1101**2  # Jy kpc
+plt.scatter(LOFAR_freq*ilt_J1101_duration, ilt_J1101_lum, c="#6a329f", s=ms)
+ax1.text(0.655, 0.32, "ILT J1101+5521", c='#6a329f', fontsize=fs, va='center', ha='center', transform=trans)
+
+# plot CHIME J0630+25 (Dong et al)
+chime_j0630 = np.loadtxt(data_path.joinpath("CHIME_J0630.txt"))
+chime_j0630_flux = chime_j0630[:,1] / chime_j0630[:,0]  # in Jy, fluence / width
+chime_j0630_dist = 0.170  # in kpc
+chime_j0630_lum = chime_j0630_flux*chime_j0630_dist**2
+
+plt.scatter(chime_j0630[:,0]*0.6*1e-3, chime_j0630_lum, c="#180161", s=ms)
+ax1.text(0.58, 0.23, "CHIME J0630+25", c='#180161', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.annotate("", xy=(0.47, 0.3 ), xytext=(0.51, 0.25),
+             arrowprops=dict(arrowstyle="->, head_length=1,head_width=0.2",color='#180161'), xycoords=trans)
 
 # plot AGNs/Blazars/QSO
 agns = np.loadtxt(data_path.joinpath("Gosia_AGN_QSO_Blazar_TDE2"), usecols=(1, 6, 8), skiprows=1)
@@ -172,49 +264,19 @@ ax1.text(0.91, 0.55, "GRB170817", c='#d208cc', fontsize=fs, va='center', ha='cen
 
 # SNs
 SN = np.loadtxt(data_path.joinpath("Gosia_SN2"), usecols=(1, 6, 8))
-ax1.scatter(SN[:, 0]*86400*SN[:, 2], SN[:, 1]*1.05026e-20, c="#6b4730", s=ms)
+ax1.scatter(SN[:, 0]*86400*SN[:, 2], SN[:, 1]*1.05026e-20, c="#6b4730", alpha=0.7, s=ms)
 ax1.text(0.95, 0.65, "Supernovae", c='#6b4730', fontsize=fs, va='center', ha='center', transform=trans)
 
 # Novae
 novae = np.loadtxt(data_path.joinpath("Gosia_Novae2"), usecols=(1, 6, 8))
 ax1.scatter(novae[:, 0]*86400*novae[:, 2], novae[:, 1]*1.05026e-20, c="#01748e", s=ms)
-ax1.text(0.95, 0.4, "Novae", c='#01748e', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.9, 0.35, "Novae", c='#01748e', fontsize=fs, va='center', ha='center', transform=trans)
 
 # XRBs
 xrbs = np.loadtxt(data_path.joinpath("Gosia_XRB2"), usecols=(1, 6, 8))
 ax1.scatter(xrbs[:, 0]*86400*xrbs[:, 2], xrbs[:, 1]*1.05026e-20, c="#CD853F", s=ms)
-ax1.text(0.76, 0.36, "XRBs", c='#CD853F', fontsize=fs, va='center', ha='center', transform=trans)
+ax1.text(0.78, 0.36, "XRBs", c='#CD853F', fontsize=fs, va='center', ha='center', transform=trans)
 
-# misc (Jupiter DAM and GCRT)
-misc = np.loadtxt(data_path.joinpath("misc"), usecols=(0, 1))
-ax1.scatter(*misc.T, c="#9d6f46", s=ms)
-ax1.text(0.375, 0.04, "Jupiter DAM", c='#9d6f46', fontsize=fs, va='center', ha='center', transform=trans)
-ax1.text(0.58, 0.49, "GCRT 1745", c='#9d6f46', fontsize=fs, va='center', ha='center', transform=trans)
-
-# MKT J1704 
-mkt = np.loadtxt(data_path.joinpath("flarey_boi"), usecols=(0, 1))
-ax1.scatter(*mkt.T, c="#87a922", s=ms)
-ax1.text(0.91, 0.348, "MKT J1704", c='#87a922', fontsize=fs, va='center', ha='center', transform=trans)
-
-# RSCVn
-rscv = np.loadtxt(data_path.joinpath("Gosia_RSCVn2"), usecols=(1, 6, 8))
-ax1.scatter(rscv[:, 0]*86400*rscv[:, 2], rscv[:, 1]*1.05026e-20, c="#293432", s=ms)
-ax1.text(0.85, 0.275, "RSCVn", c='#293432', fontsize=fs, va='center', ha='center', transform=trans)
-
-# Magnetic CV
-magcv = np.loadtxt(data_path.joinpath("Gosia_MagCV2"), usecols=(1, 6, 8), skiprows=1)
-ax1.scatter(magcv[:, 0]*86400*magcv[:, 2], magcv[:, 1]*1.05026e-20, c="#228B22", s=ms)
-ax1.text(0.7, 0.22, "Magnetic CV", c='#228B22', fontsize=fs, va='center', ha='center', transform=trans)
-
-# Solar flares
-solar = np.loadtxt(data_path.joinpath("solar_vals"), usecols=(4, 5), skiprows=1)
-ax1.scatter(*solar.T, c="#ff8b00", s=ms)
-ax1.text(0.5, 0.175, "Solar Bursts", c='#ff8b00', fontsize=fs, va='center', ha='center', transform=trans)
-
-# flaring stars
-flstars = np.loadtxt(data_path.joinpath("Gosia_flare_stars2"), usecols=(1, 6, 8), skiprows=1)
-ax1.scatter(flstars[:, 0]*86400*flstars[:, 2], flstars[:, 1]*1.05026e-20, c="#9d6f46", s=ms)
-ax1.text(0.75, 0.07, "Flaring Stars/Brown Dwarves", c='#9d6f46', fontsize=fs, va='center', ha='center', transform=trans)
-
-fig.savefig("phase_space_py.png", dpi=150)
+fig.savefig(data_path.parent.joinpath("phase_space_py.png"), dpi=150)
+fig.savefig(data_path.parent.joinpath("phase_space_py.pdf"))
 plt.show()
